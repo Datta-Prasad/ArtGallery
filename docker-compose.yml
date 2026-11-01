@@ -20,6 +20,8 @@ services:
 
   backend:
     image: dattaprasad3/docker-backend-31486:latest
+    build:
+      context: ./ArtGallery
     container_name: docker-springboot
     environment:
       SERVER_PORT: 8080
@@ -27,7 +29,7 @@ services:
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:-docker}"
     ports:
-      - "8080:8080"
+      - "8081:8080"
     depends_on:
       postgresdb:
         condition: service_healthy
@@ -37,6 +39,8 @@ services:
 
   frontend:
     image: dattaprasad3/docker-frontend-31486:latest
+    build:
+      context: ./artgallery-frontend
     container_name: docker-react
     ports:
       - "3000:80"

@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { Palette, Plus, Search, MapPin, IndianRupee, Pencil, Trash2, X, Building2 } from "lucide-react";
 import "./App.css";
 
-const API = "http://localhost:8080/api/galleries";
+const API = "http://localhost:8081/api/galleries";
 const emptyForm = { galleryName: "", city: "", artStyle: "", entryFee: "" };
 
 export default function App() {
@@ -22,7 +22,7 @@ export default function App() {
       setGalleries(await res.json());
       setError("");
     } catch {
-      setError("Cannot connect to backend. Start Spring Boot on port 8080.");
+      setError("Cannot connect to backend. Start Spring Boot on port 8081.");
     } finally {
       setLoading(false);
     }

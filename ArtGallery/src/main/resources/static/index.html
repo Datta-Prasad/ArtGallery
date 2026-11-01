@@ -180,9 +180,9 @@
 </div>
 
 <script>
-    const API_URL = (window.location.protocol.startsWith("http") && window.location.port === "8080")
+    const API_URL = window.location.protocol.startsWith("http")
         ? "/api/galleries"
-        : "http://localhost:8080/api/galleries";
+        : "http://localhost:8081/api/galleries";
     const galleryList = document.getElementById("gallery-list");
     const searchInput = document.getElementById("search");
     const galleryForm = document.getElementById("gallery-form");
