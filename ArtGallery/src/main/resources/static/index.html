@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f5f3ed">
+    <title>ArtGallery</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #262820;
+            --muted: #73756d;
+            --paper: #f5f3ed;
+            --surface: #fffefa;
+            --line: #e4e1d8;
+            --accent: #bd583f;
+            --accent-dark: #9c422f;
+            --green: #466653;
+            font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        * { box-sizing: border-box; }
+        body { margin: 0; min-width: 320px; background: var(--paper); color: var(--ink); }
+        button, input { font: inherit; }
+        button { cursor: pointer; }
+        .page { width: min(1060px, calc(100% - 40px)); margin: 0 auto; }
+        header { display: flex; align-items: center; justify-content: space-between; min-height: 72px; border-bottom: 1px solid var(--line); }
+        .brand { display: flex; align-items: center; gap: 10px; color: var(--ink); font-size: 1.1rem; font-weight: 800; letter-spacing: -.04em; text-decoration: none; }
+        .brand-icon { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; background: var(--accent); color: white; font-family: Georgia, serif; }
+        .header-note { color: var(--muted); font-size: .88rem; }
+        main { padding: 48px 0 64px; }
+        .intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding: 12px 0 34px; }
+        .eyebrow { margin: 0 0 10px; color: var(--green); font-size: .72rem; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+        h1, h2, h3 { font-family: Georgia, "Times New Roman", serif; font-weight: 500; letter-spacing: -.04em; }
+        h1 { margin: 0; font-size: clamp(2.5rem, 6vw, 4rem); line-height: 1.02; }
+        .intro-copy { max-width: 410px; margin: 12px 0 0; color: var(--muted); line-height: 1.65; }
+        .stats { display: flex; gap: 10px; }
+        .stat { min-width: 104px; padding: 14px 16px; border: 1px solid var(--line); background: var(--surface); }
+        .stat strong { display: block; font-family: Georgia, serif; font-size: 1.6rem; font-weight: 500; }
+        .stat span { color: var(--muted); font-size: .76rem; }
+        .layout { display: grid; grid-template-columns: 310px minmax(0, 1fr); align-items: start; gap: 24px; }
+        .panel { border: 1px solid var(--line); background: var(--surface); }
+        .form-panel { padding: 22px; }
+        .form-panel h2, .collection-heading h2 { margin: 0; font-size: 1.65rem; }
+        .form-help { margin: 7px 0 20px; color: var(--muted); font-size: .87rem; line-height: 1.5; }
+        .field { display: grid; gap: 6px; margin-bottom: 14px; }
+        .field label { font-size: .82rem; font-weight: 700; }
+        .field input, .search {
+            width: 100%;
+            min-height: 42px;
+            padding: 0 11px;
+            border: 1px solid var(--line);
+            border-radius: 2px;
+            outline: none;
+            background: white;
+            color: var(--ink);
+        }
+        .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+        .field input:focus, .search:focus { border-color: var(--green); outline: 2px solid rgb(70 102 83 / 14%); }
+        .actions { display: flex; gap: 8px; margin-top: 20px; }
+        .button { min-height: 41px; padding: 0 14px; border: 1px solid var(--accent); border-radius: 2px; background: var(--accent); color: white; font-size: .86rem; font-weight: 700; }
+        .button:hover { background: var(--accent-dark); }
+        .button:disabled { cursor: wait; opacity: .65; }
+        .button.secondary { border-color: var(--line); background: transparent; color: var(--ink); }
+        .button.secondary:hover { background: #f2efe8; }
+        .button.danger { border-color: #e8c9c0; background: transparent; color: var(--accent-dark); }
+        .button.danger:hover { background: #fbefec; }
+        .form-message { min-height: 20px; margin: 12px 0 0; color: var(--accent-dark); font-size: .82rem; line-height: 1.4; }
+        .collection { min-width: 0; }
+        .collection-heading { display: flex; align-items: end; justify-content: space-between; gap: 14px; margin: 0 0 16px; }
+        .collection-heading p { margin: 6px 0 0; color: var(--muted); font-size: .84rem; }
+        .search { width: min(220px, 42%); background: var(--surface); }
+        .notice { min-height: 20px; margin: 0 0 12px; color: var(--muted); font-size: .86rem; }
+        .notice.error { color: var(--accent-dark); }
+        .gallery-list { display: grid; gap: 11px; }
+        .gallery-card { display: grid; grid-template-columns: 68px minmax(0, 1fr) auto; align-items: center; gap: 15px; padding: 14px; border: 1px solid var(--line); background: var(--surface); }
+        .art-mark { display: grid; width: 68px; height: 68px; place-items: center; overflow: hidden; background: #789080; color: white; font-family: Georgia, serif; font-size: 1.65rem; }
+        .gallery-card:nth-child(6n + 2) .art-mark { background: #ba775a; }
+        .gallery-card:nth-child(6n + 3) .art-mark { background: #c09b5f; }
+        .gallery-card:nth-child(6n + 4) .art-mark { background: #718198; }
+        .gallery-card:nth-child(6n + 5) .art-mark { background: #a17b91; }
+        .gallery-card:nth-child(6n + 6) .art-mark { background: #878b68; }
+        .gallery-info { min-width: 0; }
+        .gallery-info h3 { overflow-wrap: anywhere; margin: 0; font-size: 1.25rem; }
+        .gallery-info p { margin: 5px 0 0; color: var(--muted); font-size: .84rem; }
+        .gallery-info .fee { color: var(--green); font-weight: 700; }
+        .card-actions { display: flex; gap: 6px; }
+        .card-actions .button { min-height: 34px; padding: 0 10px; font-size: .78rem; }
+        .empty { padding: 38px 20px; border: 1px dashed #d2cec3; color: var(--muted); text-align: center; }
+        .empty strong { display: block; margin-bottom: 6px; color: var(--ink); font-family: Georgia, serif; font-size: 1.25rem; font-weight: 500; }
+        footer { padding: 18px 0 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+        @media (max-width: 760px) {
+            .intro { align-items: start; flex-direction: column; }
+            .layout { grid-template-columns: 1fr; }
+            .form-panel { order: 1; }
+            .collection { order: 0; }
+            .stats { width: 100%; }
+            .stat { flex: 1; }
+        }
+        @media (max-width: 480px) {
+            .page { width: calc(100% - 28px); }
+            header { min-height: 62px; }
+            .header-note { font-size: .75rem; }
+            main { padding-top: 34px; }
+            .collection-heading { align-items: stretch; flex-direction: column; }
+            .search { width: 100%; }
+            .gallery-card { grid-template-columns: 52px minmax(0, 1fr); gap: 11px; padding: 11px; }
+            .art-mark { width: 52px; height: 60px; }
+            .card-actions { grid-column: 2; }
+            .gallery-info h3 { font-size: 1.12rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header>
+        <a class="brand" href="/" aria-label="ArtGallery home"><span class="brand-icon" aria-hidden="true">A</span>ArtGallery</a>
+        <span class="header-note">A place for art lovers</span>
+    </header>
+
+    <main>
+        <section class="intro" aria-labelledby="page-title">
+            <div>
+                <p class="eyebrow">Explore · Collect · Visit</p>
+                <h1 id="page-title">Your gallery guide.</h1>
+                <p class="intro-copy">Keep inspiring places in one spot. Add a gallery, browse the collection, and find your next art-filled afternoon.</p>
+            </div>
+            <div class="stats" aria-label="Collection summary">
+                <div class="stat"><strong id="total-count">—</strong><span>galleries</span></div>
+                <div class="stat"><strong id="style-count">—</strong><span>art styles</span></div>
+            </div>
+        </section>
+
+        <div class="layout">
+            <section class="panel form-panel" aria-labelledby="form-title">
+                <p class="eyebrow" id="form-eyebrow">Add to your list</p>
+                <h2 id="form-title">New gallery</h2>
+                <p class="form-help">Save the details of a gallery you want to explore.</p>
+                <form id="gallery-form">
+                    <div class="field">
+                        <label for="gallery-name">Gallery name</label>
+                        <input id="gallery-name" name="galleryName" maxlength="120" autocomplete="organization" required>
+                    </div>
+                    <div class="field">
+                        <label for="gallery-city">City</label>
+                        <input id="gallery-city" name="city" maxlength="100" autocomplete="address-level2" required>
+                    </div>
+                    <div class="field">
+                        <label for="gallery-style">Art style</label>
+                        <input id="gallery-style" name="artStyle" maxlength="100" placeholder="e.g. Modern, Impressionist" required>
+                    </div>
+                    <div class="field">
+                        <label for="gallery-fee">Entry fee</label>
+                        <input id="gallery-fee" name="entryFee" type="number" min="0" step="0.01" placeholder="0.00" required>
+                    </div>
+                    <div class="actions">
+                        <button class="button" id="save-button" type="submit">Add gallery</button>
+                        <button class="button secondary" id="cancel-edit" type="button" hidden>Cancel</button>
+                    </div>
+                    <p class="form-message" id="form-message" role="alert"></p>
+                </form>
+            </section>
+
+            <section class="collection" aria-labelledby="collection-title">
+                <div class="collection-heading">
+                    <div>
+                        <p class="eyebrow">The collection</p>
+                        <h2 id="collection-title">Galleries</h2>
+                        <p id="collection-count">Loading galleries...</p>
+                    </div>
+                    <label class="sr-only" for="search">Search galleries</label>
+                    <input class="search" id="search" type="search" placeholder="Search galleries">
+                </div>
+                <p class="notice" id="notice" role="status" aria-live="polite"></p>
+                <div class="gallery-list" id="gallery-list"></div>
+            </section>
+        </div>
+    </main>
+    <footer>ArtGallery <span id="year"></span> · Keep looking closer.</footer>
+</div>
+
+<script>
+    const API_URL = (window.location.protocol.startsWith("http") && window.location.port === "8080")
+        ? "/api/galleries"
+        : "http://localhost:8080/api/galleries";
+    const galleryList = document.getElementById("gallery-list");
+    const searchInput = document.getElementById("search");
+    const galleryForm = document.getElementById("gallery-form");
+    const formMessage = document.getElementById("form-message");
+    const saveButton = document.getElementById("save-button");
+    const cancelEditButton = document.getElementById("cancel-edit");
+    const notice = document.getElementById("notice");
+    let galleries = [];
+    let editingId = null;
+
+    document.getElementById("year").textContent = new Date().getFullYear();
+
+    async function request(url, options) {
+        const settings = options || {};
+        const response = await fetch(url, {
+            ...settings,
+            headers: { "Content-Type": "application/json", ...settings.headers }
+        });
+        if (!response.ok) {
+            const detail = await response.text();
+            throw new Error(detail || `Request failed (${response.status})`);
+        }
+        return response.status === 204 ? null : response.json();
+    }
+
+    function setNotice(message, isError) {
+        notice.textContent = message;
+        notice.classList.toggle("error", Boolean(isError));
+    }
+
+    function updateSummary() {
+        const styles = new Set(galleries.map(gallery => gallery.artStyle).filter(Boolean));
+        document.getElementById("total-count").textContent = galleries.length;
+        document.getElementById("style-count").textContent = styles.size;
+        document.getElementById("collection-count").textContent =
+            `${galleries.length} ${galleries.length === 1 ? "gallery" : "galleries"} in your collection`;
+    }
+
+    function makeButton(label, className, onClick) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = `button ${className}`;
+        button.textContent = label;
+        button.addEventListener("click", onClick);
+        return button;
+    }
+
+    function renderGalleries() {
+        const query = searchInput.value.trim().toLowerCase();
+        const visibleGalleries = galleries.filter(gallery =>
+            [gallery.galleryName, gallery.city, gallery.artStyle]
+                .some(value => String(value || "").toLowerCase().includes(query))
+        );
+        galleryList.replaceChildren();
+
+        if (visibleGalleries.length === 0) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            const title = document.createElement("strong");
+            title.textContent = query ? "No galleries found" : "Your list is ready for inspiration";
+            const copy = document.createElement("span");
+            copy.textContent = query ? "Try another name, city, or art style." : "Use the form to add your first gallery.";
+            empty.append(title, copy);
+            galleryList.append(empty);
+            return;
+        }
+
+        visibleGalleries.forEach((gallery, index) => {
+            const card = document.createElement("article");
+            card.className = "gallery-card";
+            const mark = document.createElement("div");
+            mark.className = "art-mark";
+            mark.setAttribute("aria-hidden", "true");
+            mark.textContent = String(gallery.artStyle || "A").trim().charAt(0).toUpperCase();
+
+            const info = document.createElement("div");
+            info.className = "gallery-info";
+            const name = document.createElement("h3");
+            name.textContent = gallery.galleryName;
+            const location = document.createElement("p");
+            location.textContent = `${gallery.city} · ${gallery.artStyle}`;
+            const fee = document.createElement("p");
+            fee.className = "fee";
+            fee.textContent = Number(gallery.entryFee) === 0
+                ? "Free entry"
+                : `Entry ₹${Number(gallery.entryFee).toFixed(2)}`;
+            info.append(name, location, fee);
+
+            const actions = document.createElement("div");
+            actions.className = "card-actions";
+            actions.append(
+                makeButton("Edit", "secondary", () => beginEdit(gallery)),
+                makeButton("Delete", "danger", () => deleteGallery(gallery))
+            );
+            card.append(mark, info, actions);
+            card.style.setProperty("--card-index", index);
+            galleryList.append(card);
+        });
+    }
+
+    function render() {
+        updateSummary();
+        renderGalleries();
+    }
+
+    async function loadGalleries() {
+        setNotice("Loading galleries...");
+        try {
+            const result = await request(API_URL);
+            if (!Array.isArray(result)) throw new Error("The gallery service returned an unexpected response.");
+            galleries = result;
+            render();
+            setNotice("");
+        } catch (error) {
+            galleries = [];
+            render();
+            setNotice(`Could not load galleries. ${error.message}`, true);
+        }
+    }
+
+    function resetForm() {
+        editingId = null;
+        galleryForm.reset();
+        formMessage.textContent = "";
+        document.getElementById("form-title").textContent = "New gallery";
+        document.getElementById("form-eyebrow").textContent = "Add to your list";
+        saveButton.textContent = "Add gallery";
+        cancelEditButton.hidden = true;
+    }
+
+    function beginEdit(gallery) {
+        editingId = gallery.id;
+        galleryForm.elements.galleryName.value = gallery.galleryName;
+        galleryForm.elements.city.value = gallery.city;
+        galleryForm.elements.artStyle.value = gallery.artStyle;
+        galleryForm.elements.entryFee.value = gallery.entryFee;
+        document.getElementById("form-title").textContent = "Edit gallery";
+        document.getElementById("form-eyebrow").textContent = "Update your list";
+        saveButton.textContent = "Save changes";
+        cancelEditButton.hidden = false;
+        formMessage.textContent = "";
+        document.getElementById("gallery-name").focus();
+    }
+
+    async function deleteGallery(gallery) {
+        if (!window.confirm(`Delete "${gallery.galleryName}"? This cannot be undone.`)) return;
+        try {
+            await request(`${API_URL}/${gallery.id}`, { method: "DELETE" });
+            setNotice("Gallery deleted.");
+            await loadGalleries();
+        } catch (error) {
+            setNotice(`Could not delete gallery. ${error.message}`, true);
+        }
+    }
+
+    galleryForm.addEventListener("submit", async event => {
+        event.preventDefault();
+        formMessage.textContent = "";
+        saveButton.disabled = true;
+        const values = new FormData(galleryForm);
+        const payload = {
+            galleryName: String(values.get("galleryName")).trim(),
+            city: String(values.get("city")).trim(),
+            artStyle: String(values.get("artStyle")).trim(),
+            entryFee: Number(values.get("entryFee"))
+        };
+        const wasEditing = editingId !== null;
+        try {
+            await request(wasEditing ? `${API_URL}/${editingId}` : API_URL, {
+                method: wasEditing ? "PUT" : "POST",
+                body: JSON.stringify(payload)
+            });
+            resetForm();
+            setNotice(wasEditing ? "Gallery updated." : "Gallery added.");
+            await loadGalleries();
+        } catch (error) {
+            formMessage.textContent = `Could not save gallery. ${error.message}`;
+        } finally {
+            saveButton.disabled = false;
+        }
+    });
+
+    cancelEditButton.addEventListener("click", resetForm);
+    searchInput.addEventListener("input", renderGalleries);
+    loadGalleries();
+</script>
+</body>
+</html>

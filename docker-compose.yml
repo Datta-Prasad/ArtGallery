@@ -1,0 +1,53 @@
+services:
+  postgresdb:
+    image: postgres:16-alpine
+    container_name: postgres-db
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
+      POSTGRES_DB: artgallerydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d artgallerydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - springboot-postgres-net
+
+  backend:
+    image: dattaprasad3/docker-backend-31486:latest
+    container_name: docker-springboot
+    environment:
+      SERVER_PORT: 8080
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdb:5432/artgallerydb
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgresdb:
+        condition: service_healthy
+    restart: on-failure
+    networks:
+      - springboot-postgres-net
+
+  frontend:
+    image: dattaprasad3/docker-frontend-31486:latest
+    container_name: docker-react
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+    restart: on-failure
+    networks:
+      - springboot-postgres-net
+
+volumes:
+  postgres_data:
+
+networks:
+  springboot-postgres-net:
