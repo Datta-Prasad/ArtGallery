@@ -32,3 +32,13 @@ jobs:
           tags: |
             dattaprasad3/docker-frontend-31486:latest
             dattaprasad3/docker-frontend-31486:sha-${{ github.sha }}
+
+      - name: Build and push backend image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./ArtGallery
+          file: ./ArtGallery/Dockerfile
+          push: true
+          tags: |
+            dattaprasad3/docker-backend-31486:latest
+            dattaprasad3/docker-backend-31486:sha-${{ github.sha }}
