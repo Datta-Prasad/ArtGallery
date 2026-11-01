@@ -4,7 +4,7 @@ services:
     container_name: postgres-db
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-docker}"
       POSTGRES_DB: artgallerydb
     ports:
       - "5432:5432"
@@ -25,7 +25,7 @@ services:
       SERVER_PORT: 8080
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgresdb:5432/artgallerydb
       SPRING_DATASOURCE_USERNAME: postgres
-      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD}"
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:-docker}"
     ports:
       - "8080:8080"
     depends_on:
